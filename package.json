@@ -9,8 +9,7 @@
   "scripts": {
     "dev": "vite",
     "preview": "vite preview",
-    "install:all": "npm install --prefix frontend",
-    "build": "npm run install:all && npm run build --prefix frontend"
+    "build": "vite build"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
