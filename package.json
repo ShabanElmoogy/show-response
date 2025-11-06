@@ -5,9 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
-    "start": "vite preview --host 0.0.0.0 --port $PORT",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "install:all": "npm install --prefix frontend",
+    "build": "npm run install:all && npm run build --prefix frontend"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
