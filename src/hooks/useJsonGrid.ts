@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import type { GridColDef } from '@mui/x-data-grid';
 
 function cleanJson(text: string): string {
+  // Step 0: HTML entities and whitespace
   let out = text
     .replace(/&quot;/g, '"')
     .replace(/&#39;/g, "'")
@@ -12,10 +13,10 @@ function cleanJson(text: string): string {
     .replace(/\n\s*/g, '')
     .trim();
 
-  // Normalize stray backslashes before structural tokens when not meant as escapes
-  // e.g., \[ ... \] => [ ... ] and \{ ... \} => { ... }
-  // Avoid touching escaped quotes or valid escapes within strings.
-  // Heuristic: only unescape when backslash precedes [, ], {, } or / outside of quoted strings.
+  // Remove BOM
+  if (out.charCodeAt(0) === 0xFEFF) out = out.slice(1);
+
+  // Step 1: Remove stray backslashes before structural tokens outside strings
   const chars = out.split('');
   let inString = false;
   let escaped = false;
@@ -35,15 +36,31 @@ function cleanJson(text: string): string {
       } else if (c === '\\') {
         const next = chars[i + 1];
         if (next === '[' || next === ']' || next === '{' || next === '}' || next === '/') {
-          // remove this backslash
           chars.splice(i, 1);
-          // step back one to re-evaluate current index after removal
           i--;
         }
       }
     }
   }
   out = chars.join('');
+
+  // Step 2: Unwrap double-encoded JSON if the entire payload is quoted
+  try {
+    if (out.length > 1 && out.startsWith('"') && out.endsWith('"')) {
+      const inner = JSON.parse(out);
+      if (typeof inner === 'object' || Array.isArray(inner)) {
+        out = JSON.stringify(inner);
+      }
+    }
+  } catch {
+    // ignore
+  }
+
+  // Step 3: Fix unquoted property names
+  out = out.replace(/([{,]\s*)([a-zA-Z_$][a-zA-Z0-9_$]*)\s*:/g, '$1"$2":');
+
+  // Step 4: Remove trailing commas before closing braces/brackets
+  out = out.replace(/,\s*(\}|\])/g, '$1');
 
   return out;
 }

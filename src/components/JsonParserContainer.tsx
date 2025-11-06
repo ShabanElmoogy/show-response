@@ -54,8 +54,53 @@ export default function JsonParserContainer({
       ]),
     },
     {
-      label: 'Single object',
-      value: JSON.stringify({ id: 1, name: 'Widget', details: { price: 9.99, tags: ['sale', 'new'] } }),
+      label: 'Array of invoice objects',
+      value: JSON.stringify([
+        {
+          TransID: Math.floor(Math.random() * 100000),
+          BranchID: Math.floor(Math.random() * 10) + 1,
+          SalesRepID: Math.floor(Math.random() * 10) + 1,
+          InvDate: new Date(Date.now() + Math.random() * 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T00:00:00',
+          InvAmount: Math.round((Math.random() * 1000 + 10) * 100) / 100,
+          InvNote: '',
+          SysInvID: Math.floor(Math.random() * 100000) + 100000,
+          CustName: 'Random Customer ' + Math.floor(Math.random() * 100),
+          SalesRepName: 'Random Rep ' + Math.floor(Math.random() * 100)
+        },
+        {
+          TransID: Math.floor(Math.random() * 100000),
+          BranchID: Math.floor(Math.random() * 10) + 1,
+          SalesRepID: Math.floor(Math.random() * 10) + 1,
+          InvDate: new Date(Date.now() + Math.random() * 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T00:00:00',
+          InvAmount: Math.round((Math.random() * 1000 + 10) * 100) / 100,
+          InvNote: '',
+          SysInvID: Math.floor(Math.random() * 100000) + 100000,
+          CustName: 'Random Customer ' + Math.floor(Math.random() * 100),
+          SalesRepName: 'Random Rep ' + Math.floor(Math.random() * 100)
+        },
+        {
+          TransID: Math.floor(Math.random() * 100000),
+          BranchID: Math.floor(Math.random() * 10) + 1,
+          SalesRepID: Math.floor(Math.random() * 10) + 1,
+          InvDate: new Date(Date.now() + Math.random() * 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T00:00:00',
+          InvAmount: Math.round((Math.random() * 1000 + 10) * 100) / 100,
+          InvNote: '',
+          SysInvID: Math.floor(Math.random() * 100000) + 100000,
+          CustName: 'Random Customer ' + Math.floor(Math.random() * 100),
+          SalesRepName: 'Random Rep ' + Math.floor(Math.random() * 100)
+        },
+        {
+          TransID: Math.floor(Math.random() * 100000),
+          BranchID: Math.floor(Math.random() * 10) + 1,
+          SalesRepID: Math.floor(Math.random() * 10) + 1,
+          InvDate: new Date(Date.now() + Math.random() * 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T00:00:00',
+          InvAmount: Math.round((Math.random() * 1000 + 10) * 100) / 100,
+          InvNote: '',
+          SysInvID: Math.floor(Math.random() * 100000) + 100000,
+          CustName: 'Random Customer ' + Math.floor(Math.random() * 100),
+          SalesRepName: 'Random Rep ' + Math.floor(Math.random() * 100)
+        }
+      ]),
     },
     {
       label: 'Primitive (string)',
