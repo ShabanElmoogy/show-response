@@ -16,7 +16,7 @@ A modern React application for parsing and visualizing JSON data in an interacti
 - **Frontend**: React 19, TypeScript
 - **Build Tool**: Vite
 - **UI Library**: Material-UI (MUI)
-- **Data Grid**: MUI X Data Grid
+- **Data Grid**: AG Grid Community
 - **Styling**: Emotion (CSS-in-JS)
 
 ## Getting Started
@@ -102,4 +102,4 @@ This project is licensed under the MIT License.
 
 - Built with [Vite](https://vitejs.dev/)
 - UI components from [Material-UI](https://mui.com/)
-- Data grid powered by [MUI X Data Grid](https://mui.com/x/react-data-grid/)
+- Data grid powered by [AG Grid](https://ag-grid.com/)
