@@ -1,4 +1,4 @@
-import { Alert, Box, Button, IconButton, InputAdornment, Stack, TextField, Typography } from '@mui/material';
+import { Alert, Box, Button, IconButton, InputAdornment, MenuItem, Select, Stack, TextField, Typography } from '@mui/material';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import SearchIcon from '@mui/icons-material/Search';
@@ -24,6 +24,53 @@ export default function JsonParserContainer({
 }: JsonParserContainerProps) {
   const [isJsonPanelCollapsed, setIsJsonPanelCollapsed] = useState(false);
 
+  const exampleOptions: { label: string; value: string }[] = [
+    {
+      label: 'Array of objects',
+      value: JSON.stringify([
+        { id: 1, name: 'Alice', age: 30 },
+        { id: 2, name: 'Bob', age: 25 }
+      ]),
+    },
+    {
+      label: 'Nested arrays in objects',
+      value: JSON.stringify([
+        {
+          country: 'USA',
+          cities: [
+            { name: 'New York', population: 8419000 },
+            { name: 'Los Angeles', population: 3980000 }
+          ],
+          codes: ['US', 'USA']
+        },
+        {
+          country: 'Canada',
+          cities: [
+            { name: 'Toronto', population: 2732000 },
+            { name: 'Vancouver', population: 675200 }
+          ],
+          codes: ['CA', 'CAN']
+        }
+      ]),
+    },
+    {
+      label: 'Single object',
+      value: JSON.stringify({ id: 1, name: 'Widget', details: { price: 9.99, tags: ['sale', 'new'] } }),
+    },
+    {
+      label: 'Primitive (string)',
+      value: JSON.stringify('Hello world'),
+    },
+    {
+      label: 'Primitive (number)',
+      value: JSON.stringify(12345),
+    },
+    {
+      label: 'Malformed example',
+      value: '[{id:1, name:"NoQuotes"}]',
+    },
+  ];
+
   return (
     <Box sx={{ height: '100vh', width: '100vw', display: 'flex', flexDirection: 'column', p: 1 }}>
       <Box sx={{ mb: 1 }}>
@@ -39,9 +86,28 @@ export default function JsonParserContainer({
           display: 'flex', 
           flexDirection: 'column' 
         }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
             {!isJsonPanelCollapsed && (
-              <Typography variant="h6" sx={{ flex: 1 }}>JSON Input</Typography>
+              <>
+                <Typography variant="h6" sx={{ flex: 1 }}>JSON Input</Typography>
+                <Select
+                  size="small"
+                  displayEmpty
+                  value=""
+                  renderValue={() => 'Examples'}
+                  onChange={(e) => {
+                    const selected = exampleOptions.find(o => o.value === e.target.value);
+                    if (selected) {
+                      onJsonChange({ target: { value: selected.value } } as any);
+                    }
+                  }}
+                  sx={{ minWidth: 180 }}
+                >
+                  {exampleOptions.map(opt => (
+                    <MenuItem key={opt.label} value={opt.value}>{opt.label}</MenuItem>
+                  ))}
+                </Select>
+              </>
             )}
             <IconButton 
               size="small" 

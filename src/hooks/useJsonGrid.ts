@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import type { GridColDef } from '@mui/x-data-grid';
 
 function cleanJson(text: string): string {
-  return text
+  let out = text
     .replace(/&quot;/g, '"')
     .replace(/&#39;/g, "'")
     .replace(/&lt;/g, '<')
@@ -11,6 +11,41 @@ function cleanJson(text: string): string {
     .replace(/\t/g, '')
     .replace(/\n\s*/g, '')
     .trim();
+
+  // Normalize stray backslashes before structural tokens when not meant as escapes
+  // e.g., \[ ... \] => [ ... ] and \{ ... \} => { ... }
+  // Avoid touching escaped quotes or valid escapes within strings.
+  // Heuristic: only unescape when backslash precedes [, ], {, } or / outside of quoted strings.
+  const chars = out.split('');
+  let inString = false;
+  let escaped = false;
+  for (let i = 0; i < chars.length; i++) {
+    const c = chars[i];
+    if (inString) {
+      if (escaped) {
+        escaped = false;
+      } else if (c === '\\') {
+        escaped = true;
+      } else if (c === '"') {
+        inString = false;
+      }
+    } else {
+      if (c === '"') {
+        inString = true;
+      } else if (c === '\\') {
+        const next = chars[i + 1];
+        if (next === '[' || next === ']' || next === '{' || next === '}' || next === '/') {
+          // remove this backslash
+          chars.splice(i, 1);
+          // step back one to re-evaluate current index after removal
+          i--;
+        }
+      }
+    }
+  }
+  out = chars.join('');
+
+  return out;
 }
 
 function isPlainObject(value: any): value is Record<string, any> {
