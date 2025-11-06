@@ -112,12 +112,28 @@ export function useJsonGrid(initialJson = '[]'): UseJsonGrid {
           Object.values(item).some(value => Array.isArray(value) && value.length > 0)
         );
 
+        // Find nested array property names
+        const nestedArrayNames = new Set<string>();
+        parsed.forEach(item => {
+          Object.entries(item).forEach(([key, value]) => {
+            if (Array.isArray(value) && value.length > 0) {
+              nestedArrayNames.add(key);
+            }
+          });
+        });
+
         parsed.forEach((item: any, parentIndex: number) => {
           if (hasNestedArrays) {
             // Create parent row
             const parentData = { ...item };
-            const statesCount = item.states ? item.states.length : 0;
-            delete parentData.states;
+            const countColumns: any = {};
+            
+            // Add count columns for each nested array
+            nestedArrayNames.forEach(arrayName => {
+              const count = item[arrayName] ? item[arrayName].length : 0;
+              countColumns[`${arrayName}Count`] = count;
+              delete parentData[arrayName];
+            });
             
             const parentFlattened = flattenRecord(parentData);
             flattenedRowsBase.push({
@@ -125,24 +141,26 @@ export function useJsonGrid(initialJson = '[]'): UseJsonGrid {
               level: 'Country',
               parentId: parentIndex + 1,
               itemType: 'Parent',
-              statesCount: statesCount,
+              ...countColumns,
               ...parentFlattened
             });
 
-            // Create child rows for states
-            if (item.states && Array.isArray(item.states)) {
-              item.states.forEach((state: any, stateIndex: number) => {
-                const stateFlattened = flattenRecord(state);
-                flattenedRowsBase.push({
-                  id: rowId++,
-                  level: 'State',
-                  parentId: parentIndex + 1,
-                  itemType: 'Child',
-                  stateIndex: stateIndex + 1,
-                  ...stateFlattened
+            // Create child rows for each nested array
+            nestedArrayNames.forEach(arrayName => {
+              if (item[arrayName] && Array.isArray(item[arrayName])) {
+                item[arrayName].forEach((childItem: any, childIndex: number) => {
+                  const childFlattened = flattenRecord(childItem);
+                  flattenedRowsBase.push({
+                    id: rowId++,
+                    level: arrayName.charAt(0).toUpperCase() + arrayName.slice(1),
+                    parentId: parentIndex + 1,
+                    itemType: 'Child',
+                    childIndex: childIndex + 1,
+                    ...childFlattened
+                  });
                 });
-              });
-            }
+              }
+            });
           } else {
             // Simple flat structure
             const flattened = flattenRecord(item);
