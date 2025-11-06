@@ -1,9 +1,6 @@
 services:
   - type: web
     name: show-response
-    env: node
-    buildCommand: npm install && npm run build
-    startCommand: npm start
-    envVars:
-      - key: NODE_ENV
-        value: production
+    env: static
+    buildCommand: npm ci && npm run build
+    staticPublishPath: ./dist
