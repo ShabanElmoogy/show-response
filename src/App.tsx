@@ -8,7 +8,7 @@ import useJsonGrid from './hooks/useJsonGrid';
 import JsonParserContainer from './components/JsonParserContainer';
 
 function App() {
-  const { jsonString, handleJsonChange, columns, rows, error } = useJsonGrid('[]');
+  const { jsonString, handleJsonChange, columns, rows, error } = useJsonGrid('');
 
   return (
     <ThemeProvider theme={muiTheme}>
