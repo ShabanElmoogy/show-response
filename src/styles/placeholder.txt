@@ -1,0 +1,1 @@
+This placeholder ensures the styles directory exists. It will be removed or replaced when real styles are added.
