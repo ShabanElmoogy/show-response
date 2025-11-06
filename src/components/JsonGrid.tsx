@@ -1,4 +1,4 @@
-import { Box } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { AgGridReact } from 'ag-grid-react';
 import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
 import { useState, useMemo } from 'react';
@@ -74,7 +74,12 @@ export default function JsonGrid({ rows, columns }: JsonGridProps) {
   }, [columns, hasGrouping, collapsedGroups]);
   
   if (!rows || rows.length === 0) {
-    return <Box sx={{ p: 2 }}>No data to display</Box>;
+    return (
+      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', p: 2 }}>
+        <Typography variant="h6" color="textSecondary">No data to display</Typography>
+        <Typography variant="body2" color="textSecondary">Enter JSON in the left panel to see the data grid</Typography>
+      </Box>
+    );
   }
   
   const handleRowClick = (params: any) => {

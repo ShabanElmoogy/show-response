@@ -1,8 +1,11 @@
 import { Alert, Box, Button, IconButton, InputAdornment, Stack, TextField, Typography } from '@mui/material';
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import SearchIcon from '@mui/icons-material/Search';
 import ClearIcon from '@mui/icons-material/Clear';
 import JsonGrid from './JsonGrid';
 import type { GridColDef } from '@mui/x-data-grid';
+import { useState } from 'react';
 
 export type JsonParserContainerProps = {
   jsonString: string;
@@ -19,6 +22,8 @@ export default function JsonParserContainer({
   rows,
   columns,
 }: JsonParserContainerProps) {
+  const [isJsonPanelCollapsed, setIsJsonPanelCollapsed] = useState(false);
+
   return (
     <Box sx={{ height: '100vh', width: '100vw', display: 'flex', flexDirection: 'column', p: 1 }}>
       <Box sx={{ mb: 1 }}>
@@ -27,67 +32,96 @@ export default function JsonParserContainer({
         </Typography>
       </Box>
 
-      <TextField
-        label="JSON Input"
-        multiline
-        rows={4}
-        value={jsonString}
-        onChange={onJsonChange}
-        placeholder='e.g. [{"id":1,"name":"Alice"}]'
-        sx={{ mb: 1 }}
-        InputProps={{
-          startAdornment: (
-            <InputAdornment position="start">
-              <SearchIcon color="secondary" />
-            </InputAdornment>
-          ),
-          endAdornment: jsonString && (
-            <InputAdornment position="end">
-              <IconButton
-                size="small"
-                onClick={() => onJsonChange({ target: { value: '' } } as any)}
-              >
-                <ClearIcon />
-              </IconButton>
-            </InputAdornment>
-          ),
-        }}
-      />
+      <Box sx={{ display: 'flex', flex: 1, minHeight: 0, gap: 1 }}>
+        <Box sx={{ 
+          width: isJsonPanelCollapsed ? '40px' : '400px', 
+          transition: 'width 0.3s ease',
+          display: 'flex', 
+          flexDirection: 'column' 
+        }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+            {!isJsonPanelCollapsed && (
+              <Typography variant="h6" sx={{ flex: 1 }}>JSON Input</Typography>
+            )}
+            <IconButton 
+              size="small" 
+              onClick={() => setIsJsonPanelCollapsed(!isJsonPanelCollapsed)}
+            >
+              {isJsonPanelCollapsed ? <ChevronRightIcon /> : <ChevronLeftIcon />}
+            </IconButton>
+          </Box>
 
-      {error && (
-        <Alert severity="error" sx={{ mb: 1 }}>
-          {error}
-        </Alert>
-      )}
+          {!isJsonPanelCollapsed && (
+            <>
+              {error && (
+                <Alert severity="error" sx={{ mb: 1 }}>
+                  {error}
+                </Alert>
+              )}
 
-      <Box sx={{ flex: 1, minHeight: 0 }}>
-        <JsonGrid rows={rows} columns={columns} />
+              <TextField
+                multiline
+                value={jsonString}
+                onChange={onJsonChange}
+                placeholder='e.g. [{"id":1,"name":"Alice"}]'
+                sx={{ 
+                  flex: 1, 
+                  '& .MuiInputBase-root': { height: '100%' }, 
+                  '& .MuiInputBase-input': { height: '100% !important', overflow: 'auto' } 
+                }}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon color="secondary" />
+                    </InputAdornment>
+                  ),
+                  endAdornment: jsonString && (
+                    <InputAdornment position="end">
+                      <IconButton
+                        size="small"
+                        onClick={() => onJsonChange({ target: { value: '' } } as any)}
+                      >
+                        <ClearIcon />
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+              />
+
+              <Stack direction="row" spacing={1} justifyContent="flex-end" sx={{ mt: 1 }}>
+                <Button 
+                  color="primary" 
+                  size="small" 
+                  onClick={() => {
+                    let cleaned = jsonString
+                      .replace(/&quot;/g, '"')
+                      .replace(/&#39;/g, "'")
+                      .replace(/\t/g, '')
+                      .replace(/\n\s*/g, '')
+                      .trim();
+                    
+                    // Fix unquoted property names
+                    cleaned = cleaned.replace(/([{,]\s*)([a-zA-Z_$][a-zA-Z0-9_$]*)\s*:/g, '$1"$2":');
+                    
+                    onJsonChange({ target: { value: cleaned } } as any);
+                  }}
+                >
+                  Fix JSON
+                </Button>
+                <Button color="secondary" size="small" onClick={() => navigator.clipboard.writeText(jsonString)}>
+                  Copy JSON
+                </Button>
+              </Stack>
+            </>
+          )}
+        </Box>
+
+        <Box sx={{ flex: 1, minHeight: 0 }}>
+          <JsonGrid rows={rows} columns={columns} />
+        </Box>
       </Box>
 
-      <Stack direction="row" spacing={1} justifyContent="flex-end" sx={{ mt: 1 }}>
-        <Button 
-          color="primary" 
-          size="small" 
-          onClick={() => {
-            let cleaned = jsonString
-              .replace(/&quot;/g, '"')
-              .replace(/&#39;/g, "'")
-              .replace(/\t/g, '')
-              .replace(/\n\s*/g, '')
-              .trim();
-            
-            // Fix unquoted property names
-            cleaned = cleaned.replace(/([{,]\s*)([a-zA-Z_$][a-zA-Z0-9_$]*)\s*:/g, '$1"$2":');
-            
-            onJsonChange({ target: { value: cleaned } } as any);
-          }}
-        >
-          Fix JSON
-        </Button>
-        <Button color="secondary" size="small" onClick={() => navigator.clipboard.writeText(jsonString)}>
-          Copy JSON
-        </Button>
-      </Stack>
+
     </Box>
   );
 }
