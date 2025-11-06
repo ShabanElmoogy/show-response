@@ -1,12 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import type { GridColDef } from '@mui/x-data-grid';
 
-function decodeHtmlEntities(text: string): string {
-  const textarea = document.createElement('textarea');
-  textarea.innerHTML = text;
-  return textarea.value;
-}
-
 function cleanJson(text: string): string {
   return text
     .replace(/&quot;/g, '"')
@@ -106,7 +100,7 @@ export function useJsonGrid(initialJson = '[]'): UseJsonGrid {
           return;
         }
 
-        const flattenedRowsBase = [];
+        const flattenedRowsBase: any[] = [];
         let rowId = 0;
         const hasNestedArrays = parsed.some((item: any) => 
           Object.values(item).some(value => Array.isArray(value) && value.length > 0)

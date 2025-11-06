@@ -5,6 +5,23 @@ import { useState, useMemo } from 'react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
 
+const gridStyles = `
+  .ag-theme-alpine .country-row {
+    background-color: #e3f2fd !important;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  .ag-theme-alpine .state-row {
+    background-color: #f9f9f9 !important;
+  }
+`;
+
+if (typeof document !== 'undefined') {
+  const styleSheet = document.createElement('style');
+  styleSheet.textContent = gridStyles;
+  document.head.appendChild(styleSheet);
+}
+
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 export type JsonGridProps = {
@@ -93,21 +110,14 @@ export default function JsonGrid({ rows, columns }: JsonGridProps) {
           resizable: true,
           flex: 1,
         }}
-        getRowStyle={(params) => {
+        getRowClass={(params) => {
           if (params.data && params.data.level === 'Country') {
-            return { 
-              backgroundColor: '#e3f2fd',
-              cursor: 'pointer',
-              fontWeight: 'bold'
-            };
+            return 'country-row';
           }
           if (params.data && params.data.level === 'State') {
-            return { 
-              backgroundColor: '#f9f9f9',
-              paddingLeft: '20px'
-            };
+            return 'state-row';
           }
-          return null;
+          return '';
         }}
       />
     </Box>
