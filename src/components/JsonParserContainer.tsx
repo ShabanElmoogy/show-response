@@ -1,4 +1,3 @@
-
 import { Alert, Box, Button, IconButton, InputAdornment, Stack, TextField, Typography, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
@@ -29,98 +28,6 @@ export default function JsonParserContainer({
 }: JsonParserContainerProps) {
   const [isJsonPanelCollapsed, setIsJsonPanelCollapsed] = useState(false);
 
-  const exampleOptions: { label: string; value: string }[] = [
-    {
-      label: 'Array of objects',
-      value: JSON.stringify([
-        { id: 1, name: 'Alice', age: 30 },
-        { id: 2, name: 'Bob', age: 25 }
-      ]),
-    },
-    {
-      label: 'Nested arrays in objects',
-      value: JSON.stringify([
-        {
-          country: 'USA',
-          cities: [
-            { name: 'New York', population: 8419000 },
-            { name: 'Los Angeles', population: 3980000 }
-          ],
-          codes: ['US', 'USA']
-        },
-        {
-          country: 'Canada',
-          cities: [
-            { name: 'Toronto', population: 2732000 },
-            { name: 'Vancouver', population: 675200 }
-          ],
-          codes: ['CA', 'CAN']
-        }
-      ]),
-    },
-    {
-      label: 'Array of invoice objects',
-      value: JSON.stringify([
-        {
-          TransID: Math.floor(Math.random() * 100000),
-          BranchID: Math.floor(Math.random() * 10) + 1,
-          SalesRepID: Math.floor(Math.random() * 10) + 1,
-          InvDate: new Date(Date.now() + Math.random() * 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T00:00:00',
-          InvAmount: Math.round((Math.random() * 1000 + 10) * 100) / 100,
-          InvNote: '',
-          SysInvID: Math.floor(Math.random() * 100000) + 100000,
-          CustName: 'Random Customer ' + Math.floor(Math.random() * 100),
-          SalesRepName: 'Random Rep ' + Math.floor(Math.random() * 100)
-        },
-        {
-          TransID: Math.floor(Math.random() * 100000),
-          BranchID: Math.floor(Math.random() * 10) + 1,
-          SalesRepID: Math.floor(Math.random() * 10) + 1,
-          InvDate: new Date(Date.now() + Math.random() * 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T00:00:00',
-          InvAmount: Math.round((Math.random() * 1000 + 10) * 100) / 100,
-          InvNote: '',
-          SysInvID: Math.floor(Math.random() * 100000) + 100000,
-          CustName: 'Random Customer ' + Math.floor(Math.random() * 100),
-          SalesRepName: 'Random Rep ' + Math.floor(Math.random() * 100)
-        },
-        {
-          TransID: Math.floor(Math.random() * 100000),
-          BranchID: Math.floor(Math.random() * 10) + 1,
-          SalesRepID: Math.floor(Math.random() * 10) + 1,
-          InvDate: new Date(Date.now() + Math.random() * 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T00:00:00',
-          InvAmount: Math.round((Math.random() * 1000 + 10) * 100) / 100,
-          InvNote: '',
-          SysInvID: Math.floor(Math.random() * 100000) + 100000,
-          CustName: 'Random Customer ' + Math.floor(Math.random() * 100),
-          SalesRepName: 'Random Rep ' + Math.floor(Math.random() * 100)
-        },
-        {
-          TransID: Math.floor(Math.random() * 100000),
-          BranchID: Math.floor(Math.random() * 10) + 1,
-          SalesRepID: Math.floor(Math.random() * 10) + 1,
-          InvDate: new Date(Date.now() + Math.random() * 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T00:00:00',
-          InvAmount: Math.round((Math.random() * 1000 + 10) * 100) / 100,
-          InvNote: '',
-          SysInvID: Math.floor(Math.random() * 100000) + 100000,
-          CustName: 'Random Customer ' + Math.floor(Math.random() * 100),
-          SalesRepName: 'Random Rep ' + Math.floor(Math.random() * 100)
-        }
-      ]),
-    },
-    {
-      label: 'Primitive (string)',
-      value: JSON.stringify('Hello world'),
-    },
-    {
-      label: 'Primitive (number)',
-      value: JSON.stringify(12345),
-    },
-    {
-      label: 'Malformed example',
-      value: '[{id:1, name:"NoQuotes"}]',
-    },
-  ];
-
   return (
     <Box sx={{ height: '100vh', width: '100vw', display: 'flex', flexDirection: 'column', p: 1 }}>
       <Box sx={{ mb: 1 }}>
@@ -136,7 +43,6 @@ export default function JsonParserContainer({
           display: 'flex', 
           flexDirection: 'column' 
         }}>
-<<<<<<< HEAD
           <Box sx={{ display: 'flex', alignItems: 'center', mb: 1, gap: 1 }}>
             {!isJsonPanelCollapsed && (
               <>
@@ -152,29 +58,6 @@ export default function JsonParserContainer({
                     <MenuItem value="log">Log</MenuItem>
                   </Select>
                 </FormControl>
-=======
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-            {!isJsonPanelCollapsed && (
-              <>
-                <Typography variant="h6" sx={{ flex: 1 }}>JSON Input</Typography>
-                <Select
-                  size="small"
-                  displayEmpty
-                  value=""
-                  renderValue={() => 'Examples'}
-                  onChange={(e) => {
-                    const selected = exampleOptions.find(o => o.value === e.target.value);
-                    if (selected) {
-                      onJsonChange({ target: { value: selected.value } } as any);
-                    }
-                  }}
-                  sx={{ minWidth: 180 }}
-                >
-                  {exampleOptions.map(opt => (
-                    <MenuItem key={opt.label} value={opt.value}>{opt.label}</MenuItem>
-                  ))}
-                </Select>
->>>>>>> 1cbb5ff0fe80ae8fb0061bd2919c9184fc2ba7f8
               </>
             )}
             <IconButton 
@@ -254,8 +137,6 @@ export default function JsonParserContainer({
           <JsonGrid rows={rows} columns={columns} />
         </Box>
       </Box>
-
-
     </Box>
   );
 }
