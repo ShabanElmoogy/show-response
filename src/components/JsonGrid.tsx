@@ -14,6 +14,11 @@ const gridStyles = `
   .ag-theme-alpine .state-row {
     background-color: #f9f9f9 !important;
   }
+  .ag-theme-alpine .status-500 {
+    background-color: #ffcdd2 !important;
+    color: #b71c1c !important;
+    font-weight: bold;
+  }
 `;
 
 if (typeof document !== 'undefined') {
@@ -112,12 +117,10 @@ export default function JsonGrid({ rows, columns }: JsonGridProps) {
         columnDefs={columnDefs}
         onRowClicked={handleRowClick}
         onGridReady={(params) => {
-          const allCols = params.columnApi.getAllColumns()?.map(col => col.getColId()) || [];
-          params.columnApi.autoSizeColumns(allCols, false);
+          params.api.autoSizeAllColumns();
         }}
         onFirstDataRendered={(params) => {
-          const allCols = params.columnApi.getAllColumns()?.map(col => col.getColId()) || [];
-          params.columnApi.autoSizeColumns(allCols, false);
+          params.api.autoSizeAllColumns();
         }}
         animateRows={true}
         rowSelection="multiple"
@@ -134,6 +137,10 @@ export default function JsonGrid({ rows, columns }: JsonGridProps) {
           }
           if (params.data && params.data.level === 'State') {
             return 'state-row';
+          }
+          if (params.data && params.data.status === '500') {
+            console.log('Found status 500 row:', params.data);
+            return 'status-500';
           }
           return '';
         }}
