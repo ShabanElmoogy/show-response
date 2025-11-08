@@ -9,6 +9,7 @@ import useJsonGrid from './hooks/useJsonGrid';
 import JsonParserContainer from './components/JsonParserContainer';
 
 function App() {
+
   const [parsingMode, setParsingMode] = useState<'json' | 'log'>('json');
   const { jsonString, handleJsonChange, columns, rows, error } = useJsonGrid('[]', parsingMode);
 
