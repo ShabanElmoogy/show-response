@@ -15,9 +15,13 @@ const gridStyles = `
     background-color: #f9f9f9 !important;
   }
   .ag-theme-alpine .status-500 {
-    background-color: #ffcdd2 !important;
-    color: #b71c1c !important;
-    font-weight: bold;
+    background-color: #f44336 !important;
+    color: white !important;
+    font-weight: bold !important;
+  }
+  .ag-theme-alpine .status-500 .ag-cell {
+    background-color: #f44336 !important;
+    color: white !important;
   }
 `;
 
@@ -138,8 +142,7 @@ export default function JsonGrid({ rows, columns }: JsonGridProps) {
           if (params.data && params.data.level === 'State') {
             return 'state-row';
           }
-          if (params.data && params.data.status === '500') {
-            console.log('Found status 500 row:', params.data);
+          if (params.data && (params.data.win32Status === '500' || params.data.win32Status === 500)) {
             return 'status-500';
           }
           return '';
