@@ -13,6 +13,50 @@ function cleanJson(text: string): string {
     .trim();
 }
 
+function parseIISLog(logText: string): any[] {
+  // Split by actual line breaks and also handle cases where lines might be concatenated
+  const lines = logText.trim().split(/\r?\n|(?=\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})/);
+  const logEntries = [];
+  let rowId = 1;
+  
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim();
+    if (!line || line.startsWith('#') || line.length < 50) continue;
+    
+    // Split by spaces but be careful with query strings
+    const parts = line.split(' ');
+    if (parts.length >= 15) {
+      logEntries.push({
+        id: rowId++,
+        date: parts[0] || '',
+        time: parts[1] || '',
+        service: parts[2] || '',
+        server: parts[3] || '',
+        clientIP: parts[4] || '',
+        method: parts[5] || '',
+        uri: parts[6] || '',
+        query: parts[7] || '',
+        port: parts[8] || '',
+        username: parts[9] === '-' ? '' : parts[9],
+        clientAgent: parts[10] || '',
+        referer: parts[11] === '-' ? '' : parts[11],
+        cookie: parts[12] === '-' ? '' : parts[12],
+        host: parts[13] || '',
+        status: parts[14] || '',
+        substatus: parts[15] || '',
+        win32Status: parts[16] || '',
+        bytesReceived: parts[17] || '',
+        bytesSent: parts[18] || '',
+        timeTaken: parts[19] || '',
+        rawLine: line
+      });
+    }
+  }
+  
+  console.log('Parsed log entries:', logEntries.length);
+  return logEntries;
+}
+
 function isPlainObject(value: any): value is Record<string, any> {
   return Object.prototype.toString.call(value) === '[object Object]';
 }
@@ -62,7 +106,7 @@ export type UseJsonGrid = {
   handleJsonChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 };
 
-export function useJsonGrid(initialJson = '[]'): UseJsonGrid {
+export function useJsonGrid(initialJson = '[]', parsingMode: 'json' | 'log' = 'json'): UseJsonGrid {
   const [jsonString, setJsonString] = useState(initialJson);
   const [columns, setColumns] = useState<GridColDef[]>([]);
   const [rows, setRows] = useState<any[]>([]);
@@ -78,6 +122,56 @@ export function useJsonGrid(initialJson = '[]'): UseJsonGrid {
       }
 
       const cleanedJson = cleanJson(json);
+      const isLogFormat = cleanedJson.includes('W3SVC') || /\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}/.test(cleanedJson);
+      
+      // Validate input matches selected mode
+      if (parsingMode === 'json' && isLogFormat) {
+        setColumns([]);
+        setRows([]);
+        setError('You must input JSON files. Switch to Log mode to parse log files.');
+        return;
+      }
+      
+      if (parsingMode === 'log' && !isLogFormat) {
+        setColumns([]);
+        setRows([]);
+        setError('You must input log files. Switch to JSON mode to parse JSON data.');
+        return;
+      }
+      
+      // Check if it's IIS log format
+      if (parsingMode === 'log' || isLogFormat) {
+        const logEntries = parseIISLog(cleanedJson);
+        if (logEntries.length > 0) {
+          const colKeys = Object.keys(logEntries[0]).filter(key => key !== 'rawLine');
+          const columnWidths: Record<string, number> = {
+            date: 100,
+            time: 100,
+            method: 80,
+            uri: 200,
+            query: 800,
+            clientIP: 120,
+            status: 80,
+            host: 180,
+            timeTaken: 100,
+            bytesSent: 100,
+            bytesReceived: 120
+          };
+          
+          const newColumns: GridColDef[] = colKeys.map((key) => ({ 
+            field: key, 
+            headerName: key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1'), 
+            width: columnWidths[key] || 120,
+            editable: false 
+          }));
+          
+          setColumns(newColumns);
+          setRows(logEntries);
+          setError(null);
+          return;
+        }
+      }
+      
       let parsed: any = JSON.parse(cleanedJson);
       console.log('Cleaned JSON:', cleanedJson);
       console.log('Parsed JSON:', parsed, 'Type:', typeof parsed, 'IsArray:', Array.isArray(parsed));
@@ -208,11 +302,11 @@ export function useJsonGrid(initialJson = '[]'): UseJsonGrid {
       setRows([]);
       setError(`Invalid JSON format: ${e.message}. Please check your input.`);
     }
-  }, []);
+  }, [parsingMode]);
 
   useEffect(() => {
     parseJson(jsonString);
-  }, []);
+  }, [parsingMode, parseJson]);
 
   const handleJsonChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const newJsonString = e.target.value;

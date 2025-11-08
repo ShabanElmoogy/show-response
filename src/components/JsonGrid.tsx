@@ -53,7 +53,7 @@ export default function JsonGrid({ rows, columns }: JsonGridProps) {
         return {
           field: col.field,
           headerName: 'Type',
-          width: 100,
+          width: 300,
           cellRenderer: (params: any) => {
             if (params.data?.level === 'Country') {
               const isCollapsed = collapsedGroups.has(params.data.parentId);
@@ -66,11 +66,17 @@ export default function JsonGrid({ rows, columns }: JsonGridProps) {
       return {
         field: col.field,
         headerName: col.headerName || col.field,
-        width: 150,
-        flex: 1
+        width: col.field === 'query' ? 1000 : undefined,
+        autoWidth: col.field !== 'query',
+        suppressSizeToFit: true
       };
     });
-    return cols.filter(col => col.field !== 'parentId');
+    return cols.filter(col => 
+      col.field !== 'parentId' && 
+      col.field !== 'service' && 
+      col.field !== 'server' && 
+      col.field !== 'clientIP'
+    );
   }, [columns, hasGrouping, collapsedGroups]);
   
   if (!rows || rows.length === 0) {
@@ -105,6 +111,14 @@ export default function JsonGrid({ rows, columns }: JsonGridProps) {
         rowData={filteredRows}
         columnDefs={columnDefs}
         onRowClicked={handleRowClick}
+        onGridReady={(params) => {
+          const allCols = params.columnApi.getAllColumns()?.map(col => col.getColId()) || [];
+          params.columnApi.autoSizeColumns(allCols, false);
+        }}
+        onFirstDataRendered={(params) => {
+          const allCols = params.columnApi.getAllColumns()?.map(col => col.getColId()) || [];
+          params.columnApi.autoSizeColumns(allCols, false);
+        }}
         animateRows={true}
         rowSelection="multiple"
         pagination={true}
@@ -113,7 +127,6 @@ export default function JsonGrid({ rows, columns }: JsonGridProps) {
           sortable: true,
           filter: true,
           resizable: true,
-          flex: 1,
         }}
         getRowClass={(params) => {
           if (params.data && params.data.level === 'Country') {

@@ -3,12 +3,14 @@ import {
   CssBaseline,
   ThemeProvider,
 } from '@mui/material';
+import { useState } from 'react';
 import muiTheme from './styles/muiTheme';
 import useJsonGrid from './hooks/useJsonGrid';
 import JsonParserContainer from './components/JsonParserContainer';
 
 function App() {
-  const { jsonString, handleJsonChange, columns, rows, error } = useJsonGrid('[]');
+  const [parsingMode, setParsingMode] = useState<'json' | 'log'>('json');
+  const { jsonString, handleJsonChange, columns, rows, error } = useJsonGrid('[]', parsingMode);
 
   return (
     <ThemeProvider theme={muiTheme}>
@@ -20,6 +22,8 @@ function App() {
           error={error}
           rows={rows}
           columns={columns}
+          parsingMode={parsingMode}
+          onParsingModeChange={setParsingMode}
         />
       </Box>
     </ThemeProvider>

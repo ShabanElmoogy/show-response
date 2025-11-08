@@ -1,4 +1,4 @@
-import { Alert, Box, Button, IconButton, InputAdornment, Stack, TextField, Typography } from '@mui/material';
+import { Alert, Box, Button, IconButton, InputAdornment, Stack, TextField, Typography, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import SearchIcon from '@mui/icons-material/Search';
@@ -13,6 +13,8 @@ export type JsonParserContainerProps = {
   error: string | null;
   rows: any[];
   columns: GridColDef[];
+  parsingMode: 'json' | 'log';
+  onParsingModeChange: (mode: 'json' | 'log') => void;
 };
 
 export default function JsonParserContainer({
@@ -21,6 +23,8 @@ export default function JsonParserContainer({
   error,
   rows,
   columns,
+  parsingMode,
+  onParsingModeChange,
 }: JsonParserContainerProps) {
   const [isJsonPanelCollapsed, setIsJsonPanelCollapsed] = useState(false);
 
@@ -28,7 +32,7 @@ export default function JsonParserContainer({
     <Box sx={{ height: '100vh', width: '100vw', display: 'flex', flexDirection: 'column', p: 1 }}>
       <Box sx={{ mb: 1 }}>
         <Typography variant="h5" component="h1" align="center">
-          JSON Response Parser
+          Data Parser
         </Typography>
       </Box>
 
@@ -39,9 +43,22 @@ export default function JsonParserContainer({
           display: 'flex', 
           flexDirection: 'column' 
         }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', mb: 1, gap: 1 }}>
             {!isJsonPanelCollapsed && (
-              <Typography variant="h6" sx={{ flex: 1 }}>JSON Input</Typography>
+              <>
+                <Typography variant="h6" sx={{ flex: 1 }}>Input</Typography>
+                <FormControl size="small" sx={{ minWidth: 100 }}>
+                  <InputLabel>Mode</InputLabel>
+                  <Select
+                    value={parsingMode}
+                    label="Mode"
+                    onChange={(e) => onParsingModeChange(e.target.value as 'json' | 'log')}
+                  >
+                    <MenuItem value="json">JSON</MenuItem>
+                    <MenuItem value="log">Log</MenuItem>
+                  </Select>
+                </FormControl>
+              </>
             )}
             <IconButton 
               size="small" 
@@ -63,7 +80,7 @@ export default function JsonParserContainer({
                 multiline
                 value={jsonString}
                 onChange={onJsonChange}
-                placeholder='e.g. [{"id":1,"name":"Alice"}]'
+                placeholder={parsingMode === 'json' ? 'e.g. [{"id":1,"name":"Alice"}]' : 'Paste IIS log lines here...'}
                 sx={{ 
                   flex: 1, 
                   '& .MuiInputBase-root': { height: '100%' }, 
